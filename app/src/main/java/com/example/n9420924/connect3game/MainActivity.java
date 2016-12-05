@@ -3,8 +3,10 @@ package com.example.n9420924.connect3game;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -12,7 +14,10 @@ public class MainActivity extends AppCompatActivity {
     //0 = mark_X and 1 = mark_O
     int activePlayer = 0;
 
+    boolean gameIsActive = true;
+
     int[] gameState= {2,2,2,2,2,2,2,2,2};
+    //All the posible win
     int[][] winningPositions = {{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}};
 
 
@@ -21,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
         int tappedCounter = Integer.parseInt(counter.getTag().toString());
 
-        if (gameState[tappedCounter] == 2) {
+        if (gameState[tappedCounter] == 2 && gameIsActive) {
             gameState[tappedCounter] = activePlayer;
             counter.setTranslationY(-1000f);
             if (activePlayer == 0) {
@@ -41,13 +46,60 @@ public class MainActivity extends AppCompatActivity {
                         gameState[winningPositioin[0]] !=2){
                     System.out.println(gameState[winningPositioin[0]]);
 
+                    String winner = "O";
+
+                    if (gameState[winningPositioin[0]] == 0){
+                        winner = "X";
+                    }
+                    gameIsActive = false;
                     //someone has won
+                    TextView winnerMessage = (TextView) findViewById(R.id.winnerMessage);
+                    winnerMessage.setText(winner + " Has Won!");
                     LinearLayout layout = (LinearLayout)findViewById(R.id.playAgainLayout);
                     layout.setVisibility(View.VISIBLE);
+
+                } else {
+                    boolean gameIsOver = true;
+                    for (int counterState : gameState) {
+                        if(counterState == 2) {
+                            gameIsOver = false;
+                        }
+                    }
+                    if (gameIsOver) {
+                        TextView winnerMessage = (TextView) findViewById(R.id.winnerMessage);
+                        winnerMessage.setText(" No one won. Draw!");
+                        LinearLayout layout = (LinearLayout)findViewById(R.id.playAgainLayout);
+                        layout.setVisibility(View.VISIBLE);
+
+                    }
 
                 }
             }
         }
+
+    }
+
+    public void playAgain(View view){
+        gameIsActive = true;
+
+        LinearLayout layout = (LinearLayout)findViewById(R.id.playAgainLayout);
+        layout.setVisibility(View.INVISIBLE);
+
+        // Restart activePlayer
+       activePlayer = 0;
+
+        //restart gameState to initial state
+        for(int i = 0; i < gameState.length ; i++){
+            gameState[i] = 2;
+        }
+
+        // restart GridLayout
+        GridLayout gridLayout = (GridLayout) findViewById(R.id.gridLayout);
+
+        for (int i = 0; i < gridLayout.getChildCount() ; i++) {
+            ((ImageView) gridLayout.getChildAt(i)).setImageResource(0);
+        }
+
 
     }
     @Override
